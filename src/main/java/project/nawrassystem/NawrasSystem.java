@@ -43,6 +43,27 @@ public class NawrasSystem {
             System.out.println("Error saving file.");
         }
     }
+     private static void modifyPermit() {
+        System.out.print("Enter Permit ID to modify: ");
+        int id = scanner.nextInt();
+        scanner.nextLine();
+
+        for (Permit permit : permits) {
+            if (permit.getPermitId() == id) {
+                if (permit.getStatus().equals("Expired")) {
+                    System.out.println("Cannot modify expired permits. View-only in history.");
+                } else {
+                    System.out.print("Enter new trip date (YYYY-MM-DD): ");
+                    LocalDate newDate = LocalDate.parse(scanner.nextLine());
+                    permit.setTripDate(newDate);
+                    savePermits();
+                    System.out.println("Permit updated successfully!");
+                }
+                return;
+            }
+        }
+        System.out.println("Permit not found.");
+    }
 
 
 
