@@ -65,6 +65,39 @@ public class NawrasSystem {
         System.out.println("Permit not found.");
     }
 
+ private static void viewPermitDetails() {
+        System.out.print("Enter Permit ID: ");
+        int id = scanner.nextInt();
+        scanner.nextLine();
 
+        for (Permit permit : permits) {
+            if (permit.getPermitId() == id) {
+                System.out.println("\n=== Permit Details ===");
+                System.out.println("Permit ID: " + permit.getPermitId());
+                System.out.println("Applicant: " + permit.getApplicantName());
+                System.out.println("Trip Date: " + permit.getTripDate());
+                System.out.println("Status: " + permit.getStatus());
+                System.out.println("\nShow this screen as proof (example: QR or download view)");
+                return;
+            }
+        }
+        System.out.println("Permit not found.");
+    }
 
+    private static void showPermitHistory() {
+        System.out.println("\n----- Permit History -----");
+        if (permits.isEmpty()) {
+            System.out.println("No permits found.");
+            return;
+        }
+        for (Permit permit : permits) {
+            System.out.println(permit);
+        }
+    }
+
+   
+
+   
 }
+
+
