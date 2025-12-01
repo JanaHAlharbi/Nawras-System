@@ -1,25 +1,54 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- */
-
 package project.nawrassystem;
+import java.io.BufferedReader;
+import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.Scanner;
-/**
- *
- * @author janaalharbi
- */
-public class NawrasSystem {
 
+public class NawrasSystem {
+    private static final String FILE_NAME = "permits.txt";
+    static ArrayList<Permit> permits = new ArrayList<>();
+    static Scanner scanner = new Scanner(System.in);
     public static void main(String[] args) {
-       
+       loadPermits();
+        
+        while (true) {
+            System.out.println("\n===== Nawras Permit System =====");
+            System.out.println("1. Request Permit");
+            System.out.println("2. Modify Permit (Only Active)");
+            System.out.println("3. View Permit Details");
+            System.out.println("4. List Permit History");
+            System.out.println("5. Exit");
+            System.out.print("Choose option: ");
+            int choice = scanner.nextInt();
+            scanner.nextLine(); // consume line
+
+            switch (choice) {
+                case 1:
+                    requestPermit();
+                    break;
+                case 2:
+                    modifyPermit();
+                    break;
+                case 3:
+                    viewPermitDetails();
+                    break;
+                case 4:
+                    showPermitHistory();
+                    break;
+                case 5:
+                    System.out.println("Thank you for using Nawras System!");
+                    return;
+                default:
+                    System.out.println("Invalid choice, try again.");
+         }  
+      }
     }
 
-
-     private static void requestPermit() {
+     static void requestPermit() {
         System.out.print("Enter Applicant Name: ");
         String name = scanner.nextLine();
 
@@ -34,15 +63,6 @@ public class NawrasSystem {
         System.out.println("Permit created successfully! ID: " + id);
     }
 
-    private static void savePermits() {
-        try (PrintWriter out = new PrintWriter(new FileWriter(FILE_NAME))) {
-            for (Permit permit : permits) {
-                out.println(permit);
-            }
-        } catch (IOException e) {
-            System.out.println("Error saving file.");
-        }
-    }
      private static void modifyPermit() {
         System.out.print("Enter Permit ID to modify: ");
         int id = scanner.nextInt();
@@ -95,9 +115,24 @@ public class NawrasSystem {
         }
     }
 
-   
-
-   
+   private static void loadPermits() {
+        try (BufferedReader br = new BufferedReader(new FileReader(FILE_NAME))) {
+            String line;
+            while ((line = br.readLine()) != null) {
+                permits.add(Permit.fromString(line));
+            }
+        } catch (IOException ignored) {}
+    }
+ 
+   static void savePermits() {
+        try (PrintWriter out = new PrintWriter(new FileWriter(FILE_NAME))) {
+            for (Permit permit : permits) {
+                out.println(permit);
+            }
+        } catch (IOException e) {
+            System.out.println("Error saving file.");
+        }
+    }
 }
 
 

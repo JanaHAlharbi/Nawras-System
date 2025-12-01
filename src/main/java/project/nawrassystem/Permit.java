@@ -11,7 +11,7 @@ package project.nawrassystem;
  */
 
 public class Permit {
-     private int permitId;
+    private int permitId;
     private String applicantName;
     private LocalDate tripDate;
 
