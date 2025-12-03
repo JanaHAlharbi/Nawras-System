@@ -1,19 +1,11 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
- */
 package project.nawrassystem;
-    import java.time.LocalDate;
-
-/**
- *
- * @author janaalharbi
- */
+import java.time.LocalDate;
 
 public class Permit {
     private int permitId;
     private String applicantName;
     private LocalDate tripDate;
+    private String status;
 
     public Permit(int permitId, String applicantName, LocalDate tripDate) {
         this.permitId = permitId;
@@ -39,6 +31,9 @@ public class Permit {
 
     public String getStatus() {
         return tripDate.isBefore(LocalDate.now()) ? "Expired" : "Active";
+    }
+    public void setStatus( String newStatus){
+        this.status = newStatus;
     }
 
     @Override

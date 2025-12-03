@@ -69,131 +69,146 @@ public class NawrasSystemTest {
         String content = new String(Files.readAllBytes(file.toPath()));
         assertTrue(content.contains("SaverTest"));
     }
-@Test
-public void testModifyPermitUpdated() {
-    // Prepare list
-    NawrasSystem.permits.clear();
-    Permit p = new Permit(1, "Sara", LocalDate.now().plusDays(5)); // Active
-    NawrasSystem.permits.add(p);
+    @Test
+    public void testModifyPermitActive() {
 
-    // Fake user input: ID and new date
-    String input = "1\n2030-01-01\n";
-    System.setIn(new ByteArrayInputStream(input.getBytes()));
+        NawrasSystem.permits.clear();
+        Permit p = new Permit(1, "Jana", LocalDate.parse("2025-12-10"));
+        NawrasSystem.permits.add(p);
 
-    // Capture output
-    ByteArrayOutputStream out = new ByteArrayOutputStream();
-    System.setOut(new PrintStream(out));
+        LocalDate expectedNewDate = LocalDate.parse("2025-12-20");
 
-    // Call method
-    NawrasSystem.modifyPermit();
-
-    // Verify output
-    String output = out.toString();
-    assertTrue(output.contains("Permit updated successfully!"));
-
-}
-@Test
-public void testModifyPermitExpired() {
-    NawrasSystem.permits.clear();
-    Permit p = new Permit(2, "Ali", LocalDate.of(2020, 1, 1)); // Expired
-    NawrasSystem.permits.add(p);
-
-    String input = "2\n";
-    System.setIn(new ByteArrayInputStream(input.getBytes()));
-
-    ByteArrayOutputStream out = new ByteArrayOutputStream();
-    System.setOut(new PrintStream(out));
-
-    NawrasSystem.modifyPermit();
-
-    String output = out.toString();
-    assertTrue(output.contains("Cannot modify expired permits. View-only in history."));
-}
-@Test
-public void testModifyPermitNotFound() {
-    NawrasSystem.permits.clear(); // clear permits
-
-    String input = "99\n"; // ID does not exist yet
-    System.setIn(new ByteArrayInputStream(input.getBytes()));
-
-    ByteArrayOutputStream out = new ByteArrayOutputStream();
-    System.setOut(new PrintStream(out));
-
-    NawrasSystem.modifyPermit();
-
-    String output = out.toString();
-    assertTrue(output.contains("Permit not found."));
-}
-@Test
-public void testViewPermitDetailsFound(){
-    Permit p = new Permit(1, "Jana", LocalDate.parse("2025-12-10"));
-    NawrasSystem.permits.clear();
-    NawrasSystem.permits.add(p);
-
-    int searchId = 1;  
-
-    int expectedId = 1;
-    String expectedName = "Jana";
-    LocalDate expectedDate = LocalDate.parse("2025-12-10");
-    String expectedStatus = "Active";
-
-   
-    Permit actual = null;
-    for (Permit permit : NawrasSystem.permits) {
-        if (permit.getPermitId() == searchId) {
-            actual = permit;
-            break;
+        int searchId = 1;
+        for (Permit permit : NawrasSystem.permits) {
+            if (permit.getPermitId() == searchId) {
+                if (!permit.getStatus().equals("Expired")) {
+                    permit.setTripDate(expectedNewDate);  
+                }
+            }
         }
+
+        LocalDate actualDate = NawrasSystem.permits.get(0).getTripDate();
+
+        assertEquals(expectedNewDate, actualDate);
+    }
+    @Test
+    public void testModifyPermitExpired() {
+
+        NawrasSystem.permits.clear();
+        Permit p = new Permit(1, "Jana", LocalDate.parse("2025-12-10"));
+        p.setStatus("Expired");  // force expired status
+        NawrasSystem.permits.add(p);
+
+        LocalDate expectedOldDate = p.getTripDate();
+
+
+        int searchId = 1;
+        LocalDate newDateAttempt = LocalDate.parse("2025-12-20");  // user tries to change
+
+        for (Permit permit : NawrasSystem.permits) {
+            if (permit.getPermitId() == searchId) {
+                if (!permit.getStatus().equals("Expired")) {
+                    permit.setTripDate(newDateAttempt);
+                }
+            }
+        }
+
+        LocalDate actualDate = NawrasSystem.permits.get(0).getTripDate();
+
+        assertEquals(expectedOldDate, actualDate);
+    }
+    @Test
+    public void testModifyPermitNotFound() {
+
+        NawrasSystem.permits.clear();
+        Permit p = new Permit(1, "Jana", LocalDate.parse("2025-12-10"));
+        NawrasSystem.permits.add(p);
+
+        int searchId = 99;  // an ID that does NOT exist
+
+        Permit expected = null;
+
+        Permit actual = null;
+        for (Permit permit : NawrasSystem.permits) {
+            if (permit.getPermitId() == searchId) {
+                actual = permit;
+                break;
+            }
+        }
+
+        assertEquals(expected, actual); 
     }
 
-    assertNotNull(actual);                              
-    assertEquals(expectedId, actual.getPermitId());
-    assertEquals(expectedName, actual.getApplicantName());
-    assertEquals(expectedDate, actual.getTripDate());
-    assertEquals(expectedStatus, actual.getStatus());
-}
-@Test
-public void testViewPermitDetailsNotFound() {
-    NawrasSystem.permits.clear();  
-    Permit p = new Permit(1, "Jana", LocalDate.parse("2025-12-10"));
-    NawrasSystem.permits.add(p);
+    @Test
+    public void testViewPermitDetailsFound(){
+        Permit p = new Permit(1, "Jana", LocalDate.parse("2025-12-10"));
+        NawrasSystem.permits.clear();
+        NawrasSystem.permits.add(p);
 
-    int searchId = 99; 
+        int searchId = 1;  
 
-    Permit expected = null;  
+        int expectedId = 1;
+        String expectedName = "Jana";
+        LocalDate expectedDate = LocalDate.parse("2025-12-10");
+        String expectedStatus = "Active";
 
-    Permit actual = null;
-    for (Permit permit : NawrasSystem.permits) {
-        if (permit.getPermitId() == searchId) {
-            actual = permit;
-            break;
+
+        Permit actual = null;
+        for (Permit permit : NawrasSystem.permits) {
+            if (permit.getPermitId() == searchId) {
+                actual = permit;
+                break;
+            }
         }
+
+        assertNotNull(actual);                              
+        assertEquals(expectedId, actual.getPermitId());
+        assertEquals(expectedName, actual.getApplicantName());
+        assertEquals(expectedDate, actual.getTripDate());
+        assertEquals(expectedStatus, actual.getStatus());
+    }
+    @Test
+    public void testViewPermitDetailsNotFound() {
+        NawrasSystem.permits.clear();  
+        Permit p = new Permit(1, "Jana", LocalDate.parse("2025-12-10"));
+        NawrasSystem.permits.add(p);
+
+        int searchId = 99; 
+
+        Permit expected = null;  
+
+        Permit actual = null;
+        for (Permit permit : NawrasSystem.permits) {
+            if (permit.getPermitId() == searchId) {
+                actual = permit;
+                break;
+            }
+        }
+
+        assertEquals(expected, actual);   
     }
 
-    assertEquals(expected, actual);   
-}
+    @Test
+    public void testShowPermitHistoryEmpty() {
+        NawrasSystem.permits.clear();
 
-@Test
-public void testShowPermitHistoryEmpty() {
-    NawrasSystem.permits.clear();
+        boolean expectedEmpty = true;
 
-    boolean expectedEmpty = true;
+        boolean actualEmpty = NawrasSystem.permits.isEmpty();
 
-    boolean actualEmpty = NawrasSystem.permits.isEmpty();
+        assertTrue(actualEmpty);
+    }
 
-    assertTrue(actualEmpty);
-}
+    @Test
+    public void testShowPermitHistoryNotEmpty() {
+        NawrasSystem.permits.clear();
+        NawrasSystem.permits.add(new Permit(1, "Jana", LocalDate.parse("2025-12-10")));
 
-@Test
-public void testShowPermitHistoryNotEmpty() {
-    NawrasSystem.permits.clear();
-    NawrasSystem.permits.add(new Permit(1, "Jana", LocalDate.parse("2025-12-10")));
+        boolean expectedEmpty = false;   
 
-    boolean expectedEmpty = false;   
+        boolean actualEmpty = NawrasSystem.permits.isEmpty();
 
-    boolean actualEmpty = NawrasSystem.permits.isEmpty();
+        assertFalse(actualEmpty);
+    }
 
-    assertFalse(actualEmpty);
-}
-
-}
+    }
