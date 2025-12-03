@@ -52,8 +52,17 @@ public class NawrasSystem {
         System.out.print("Enter Applicant Name: ");
         String name = scanner.nextLine();
 
-        System.out.print("Enter Trip Date (YYYY-MM-DD): ");
-        LocalDate date = LocalDate.parse(scanner.nextLine());
+            LocalDate date = null;
+    while (true) {
+        try {
+            System.out.print("Enter Trip Date (YYYY-MM-DD): ");
+            date = LocalDate.parse(scanner.nextLine());
+            break; 
+        } catch (Exception e) {
+            System.out.println("❌ Invalid date format. Please try again (YYYY-MM-DD).");
+        }
+    }
+
 
         int id = permits.size() + 1;
         Permit newPermit = new Permit(id, name, date);

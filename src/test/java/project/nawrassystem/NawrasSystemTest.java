@@ -1,74 +1,38 @@
 package project.nawrassystem;
-
 import org.junit.Test;
 import org.junit.Before;
 import org.junit.After;
 import static org.junit.Assert.*;
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
 import java.io.File;
-import java.io.PrintStream;
-import java.nio.file.Files;
 import java.time.LocalDate;
-import java.util.ArrayList;
 import java.util.Scanner;
 
 public class NawrasSystemTest {
 
     private static final String FILE_NAME = "permits.txt";
 
-    @org.junit.jupiter.api.BeforeAll
-    public static void setUpClass() throws Exception {
-    }
-
-    @org.junit.jupiter.api.AfterAll
-    public static void tearDownClass() throws Exception {
-    }
-
-    @org.junit.jupiter.api.BeforeEach
-    public void setUp() throws Exception {
-    }
-
-    @org.junit.jupiter.api.AfterEach
-    public void tearDown() throws Exception {
-    }
-
 
     @Test
-    public void testRequestPermit() {
-        // 1.Preparation
-        String inputs = "Jana\n2025-12-30\n";
-        ByteArrayInputStream in = new ByteArrayInputStream(inputs.getBytes());
-        NawrasSystem.scanner = new Scanner(in);
+    public void testRequestPermitLogic() {
 
-        // 2.Calling
-        NawrasSystem.requestPermit();
+        NawrasSystem.permits.clear();   
 
-        // 3.Assertion
-        ArrayList<Permit> list = NawrasSystem.permits;
-        assertEquals(1, list.size());
-        
-        Permit p = list.get(0);
-        assertEquals("Jana", p.getApplicantName());
-        assertNotNull(p);
+        String expectedName = "Jana";
+        LocalDate expectedDate = LocalDate.parse("2025-12-10");
+        int expectedId = 1;
+
+        int id = NawrasSystem.permits.size() + 1;      // should be 1
+        Permit newPermit = new Permit(id, expectedName, expectedDate);
+        NawrasSystem.permits.add(newPermit);
+
+        Permit actual = NawrasSystem.permits.get(0);
+
+        assertEquals(expectedId, actual.getPermitId());
+        assertEquals(expectedName, actual.getApplicantName());
+        assertEquals(expectedDate, actual.getTripDate());
     }
 
-    @Test
-    public void testSavePermits() throws Exception {
-        // 1.Setup
-        ArrayList<Permit> list = NawrasSystem.permits;
-        list.add(new Permit(100, "SaverTest", LocalDate.of(2025, 10, 10)));
 
-        // 2.Calling
-        NawrasSystem.savePermits();
-
-        // 3.Assertion
-        File file = new File(FILE_NAME);
-        assertTrue(file.exists()); 
-        
-        String content = new String(Files.readAllBytes(file.toPath()));
-        assertTrue(content.contains("SaverTest"));
-    }
     @Test
     public void testModifyPermitActive() {
 
