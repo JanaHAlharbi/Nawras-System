@@ -85,7 +85,7 @@ public class NawrasSystem {
         System.out.println("Permit not found.");
     }
 
- private static void viewPermitDetails() {
+    static void viewPermitDetails() {
         System.out.print("Enter Permit ID: ");
         int id = scanner.nextInt();
         scanner.nextLine();
