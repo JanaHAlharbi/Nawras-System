@@ -102,7 +102,7 @@ public class NawrasSystemTest {
 
 
     @Test
-    public void testViewPermitDetailsFound(){
+    public void testviewApplicantPermitDetailFound(){
 
         Applicant app = new Applicant("Jana", "1234567890");
         Permit p = new Permit(1, app, LocalDate.parse("2025-12-10"));
@@ -130,7 +130,7 @@ public class NawrasSystemTest {
 
 
     @Test
-    public void testViewPermitDetailsNotFound() {
+    public void testviewApplicantPermitDetailNotFound() {
 
         NawrasSystem.permits.clear();
         Applicant app = new Applicant("Jana", "1234567890");
@@ -154,7 +154,7 @@ public class NawrasSystemTest {
 
 
     @Test
-    public void testShowPermitHistoryEmpty() {
+    public void testlistAllApplicantPermitsEmpty() {
 
         NawrasSystem.permits.clear();
         boolean actualEmpty = NawrasSystem.permits.isEmpty();
@@ -164,7 +164,7 @@ public class NawrasSystemTest {
 
 
     @Test
-    public void testShowPermitHistoryNotEmpty() {
+    public void testlistAllApplicantPermitsNotEmpty() {
 
         NawrasSystem.permits.clear();
         Applicant app = new Applicant("Jana", "1234567890");

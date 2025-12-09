@@ -15,11 +15,11 @@ public class NawrasSystem {
         permits = fileHandler.loadPermits();
 
         while (true) {
-            System.out.println("\n===== Nawras Permit System =====");
+            System.out.println("\n===== NAWRAS System =====");
             System.out.println("1. Request Permit");
-            System.out.println("2. Modify Permit (Only Active)");
-            System.out.println("3. View Permit Details");
-            System.out.println("4. List Permit History");
+            System.out.println("2. Request to Modify Permit");
+            System.out.println("3. View Applicant Permit Detail");
+            System.out.println("4. List All Applicant Permits");
             System.out.println("5. Exit");
             System.out.print("Choose option: ");
 
@@ -28,39 +28,34 @@ public class NawrasSystem {
 
             switch (choice) {
                 case 1 -> requestPermit();
-                case 2 -> modifyPermit();
-                case 3 -> viewPermitDetails();
-                case 4 -> showPermitHistory();
+                case 2 -> requestToModifyPermit();
+                case 3 -> viewApplicantPermitDetail();
+                case 4 -> listAllApplicantPermits();
                 case 5 -> {
-                    System.out.println("Thank you!");
+                    System.out.println("Thank you for using NAWRAS!");
                     return;
                 }
-                default -> System.out.println("Invalid choice.");
+                default -> System.out.println("❌ Invalid choice. Try again.");
             }
         }
     }
-
-    static void requestPermit() {
-
-        // NAME
+    
+    private static void requestPermit() {
         String name;
         while (true) {
             System.out.print("Enter Applicant Name: ");
             name = scanner.nextLine().trim();
-
+            
             if (name.isEmpty()) {
                 System.out.println("❌ Name cannot be empty.");
                 continue;
             }
-
-            if (name.matches("[a-zA-Z\\s]+")) {
+            if (name.matches("[\\p{L}\\s]+")) {
                 break;
-            } else {
-                System.out.println("❌ Invalid name. Use English letters only.");
             }
+            System.out.println("❌ Invalid name. Letters only.");
         }
-
-        // ID
+        
         String applicantId;
         while (true) {
             System.out.print("Enter Applicant ID (10 digits): ");
@@ -68,15 +63,11 @@ public class NawrasSystem {
 
             if (applicantId.matches("\\d{10}")) {
                 break;
-            } else {
-                System.out.println("❌ Invalid ID. Enter 10-digit number.");
             }
+            System.out.println("❌ Invalid ID. Enter 10-digit number.");
         }
 
-        Applicant applicant = new Applicant(name, applicantId);
-
-        // DATE
-        LocalDate date = null;
+        LocalDate date;
         while (true) {
             try {
                 System.out.print("Enter Trip Date (YYYY-MM-DD): ");
@@ -87,68 +78,86 @@ public class NawrasSystem {
             }
         }
 
+        Applicant applicant = new Applicant(name, applicantId);
+
         int id = permits.size() + 1;
         Permit newPermit = new Permit(id, applicant, date);
         permits.add(newPermit);
-
         fileHandler.savePermits(permits);
 
-        System.out.println("✔️ Permit created! ID: " + id);
+        System.out.println("✔ Permit created successfully! ID: " + id);
     }
 
-    private static void modifyPermit() {
-        System.out.print("Enter Permit ID to modify: ");
-        int id = scanner.nextInt();
-        scanner.nextLine();
+    private static void requestToModifyPermit() {
+    int id = 0;
 
-        for (Permit permit : permits) {
-            if (permit.getPermitId() == id) {
-                if (permit.getStatus().equals("Expired")) {
-                    System.out.println("Cannot modify expired permits.");
-                } else {
-                    try {
-                        System.out.print("Enter new date: ");
-                        LocalDate newDate = LocalDate.parse(scanner.nextLine());
-                        permit.setTripDate(newDate);
-                        fileHandler.savePermits(permits);
-                        System.out.println("Updated.");
-                    } catch (Exception e) {
-                        System.out.println("Invalid date.");
-                    }
-                }
+    while (true) {
+        System.out.print("Enter Permit ID to modify: ");
+        String input = scanner.nextLine();
+
+        try {
+            id = Integer.parseInt(input);
+            break; // valid number entered
+        } catch (NumberFormatException e) {
+            System.out.println("❌ Invalid permit ID. Please enter a numeric value.");
+        }
+    }
+
+    for (Permit permit : permits) {
+        if (permit.getPermitId() == id) {
+
+            if (permit.getStatus().equalsIgnoreCase("Expired")) {
+                System.out.println("❌ Cannot modify expired permits.");
                 return;
             }
-        }
-        System.out.println("Not found.");
-    }
+            while (true) {
+                System.out.print("Enter new trip date (YYYY-MM-DD): ");
+                String dateInput = scanner.nextLine();
 
-    static void viewPermitDetails() {
+                try {
+                    LocalDate newDate = LocalDate.parse(dateInput);
+                    permit.setTripDate(newDate);
+                    fileHandler.savePermits(permits);
+                    System.out.println("✔ Modification request submitted.");
+                    return;
+                } catch (Exception e) {
+                    System.out.println("❌ Invalid date format.");
+                }
+            }
+        }
+    }
+    System.out.println("❌ Permit not found.");
+}
+
+    private static void viewApplicantPermitDetail() {
         System.out.print("Enter Permit ID: ");
         int id = scanner.nextInt();
         scanner.nextLine();
 
         for (Permit permit : permits) {
             if (permit.getPermitId() == id) {
-                System.out.println("\n=== Permit Details ===");
+                System.out.println("\n=== Permit Detail ===");
                 System.out.println("Permit ID: " + permit.getPermitId());
-                System.out.println("Name: " + permit.getApplicant().getName());
+                System.out.println("Applicant Name: " + permit.getApplicant().getName());
                 System.out.println("Applicant ID: " + permit.getApplicant().getId());
                 System.out.println("Trip Date: " + permit.getTripDate());
                 System.out.println("Status: " + permit.getStatus());
                 return;
             }
         }
-        System.out.println("Not found.");
+        System.out.println("❌ Permit not found.");
     }
 
-    private static void showPermitHistory() {
-        System.out.println("\n----- Permit History -----");
+    private static void listAllApplicantPermits() {
+        System.out.println("\n----- All Applicant Permits -----");
+
         if (permits.isEmpty()) {
-            System.out.println("No permits.");
-        } else {
-            for (Permit permit : permits) {
-                System.out.println(permit);
-            }
+            System.out.println("No permits found.");
+            return;
+        }
+
+        for (Permit permit : permits) {
+            System.out.println(permit);
         }
     }
 }

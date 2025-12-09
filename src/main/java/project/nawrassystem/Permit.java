@@ -1,5 +1,4 @@
 package project.nawrassystem;
-
 import java.time.LocalDate;
 
 public class Permit {
@@ -44,7 +43,6 @@ public class Permit {
 
     @Override
     public String toString() {
-        // id,name,applicantId,date
         return permitId + ","
                 + applicant.getName() + ","
                 + applicant.getId() + ","
